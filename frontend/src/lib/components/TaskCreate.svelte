@@ -136,7 +136,7 @@
 
           <div class="field-container">
             <button type="submit" class="pos-btn">Create Task</button>
-            <button type="button" on:click={closeModal} class="neg-btn">Discard</button>
+            <button type="button" on:click={closeModal} class="neg-btn">Cancel</button>
           </div>        
         </div>
       </div>
