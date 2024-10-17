@@ -18,7 +18,7 @@
 
   onMount( async () => {
     try {
-      const response = await axios.post(`http://localhost:3000/tms/plans`, {
+      const response = await axios.post(`http://localhost:3000/tms/app/plans`, {
         appName
       },{
         headers: {
@@ -38,7 +38,7 @@
   });
  
   async function createPlan() {
-    const response = await axios.post("http://localhost:3000/tms/createPlan", {
+    const response = await axios.post("http://localhost:3000/tms/app/createPlan", {
       appName,
       newPlan
     }, {
@@ -161,6 +161,7 @@
     transform: translate(-50%, -50%);
     width: 70vw;
     height: 70vh;
+    overflow-y: auto; /* Enable vertical scrolling inside modal */
     padding: 15px;
     border-radius: 5px;
     background-color: rgb(255, 255, 255);

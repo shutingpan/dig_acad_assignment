@@ -31,7 +31,7 @@
   // Get info: User permits, tasks under this app, plan-colour pairings.
   onMount(async () => {
     try {
-      const response = await axios.post('http://localhost:3000/tms/getTaskboard', {
+      const response = await axios.post('http://localhost:3000/tms/app/taskboard', {
         appName
       }, {
         headers: {
@@ -274,8 +274,8 @@
 
   .app-info {
     display: flex;
-    /* flex-direction: column; */
-    flex-direction: center;
+    flex-direction: column; 
+    /* flex-direction: center; */
   }
 
   .app-info h2 {
@@ -284,8 +284,8 @@
   }
 
   .view-app-btn {
-    margin: 5px;
-    padding: 5px;
+    margin: 10px 0px;
+    padding: 0px;
     font-size: 15px;
     color: #333;
     border: none;

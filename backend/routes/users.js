@@ -22,22 +22,22 @@ router.route("/profile/updatePassword").put(isAuthenticatedUser, updatePassword)
 
 // TMS - Apps
 router.route("/tms").get(isAuthenticatedUser, getAllApps);
-router.route("/tms/createApp").post(isAuthenticatedUser, authorizedGrps("pl"), createApp);
 router.route("/tms/app").post(isAuthenticatedUser, getAppDetails);
+router.route("/tms/createApp").post(isAuthenticatedUser, authorizedGrps("pl"), createApp);
 
 // TMS - Plans
-router.route("/tms/plans").post(isAuthenticatedUser, getAllPlans);
-router.route("/tms/createPlan").post(isAuthenticatedUser, authorizedGrps("pm"), createPlan);
+router.route("/tms/app/plans").post(isAuthenticatedUser, getAllPlans);
+router.route("/tms/app/createPlan").post(isAuthenticatedUser, authorizedGrps("pm"), createPlan);
 
 // TMS - Taskboard
-router.route("/tms/getTaskboard").post(isAuthenticatedUser, getTaskboard); // appName data sent
-router.route("/tms/getTask").post(isAuthenticatedUser, getTask);
+router.route("/tms/app/taskboard").post(isAuthenticatedUser, getTaskboard);
+router.route("/tms/app/task").post(isAuthenticatedUser, getTask);
 
 // TMS - Task actions
 // Based on app-permits: block ability to view action (FE) & perform action (BE)
-router.route("/tms/createTask").post(isAuthenticatedUser, isPermittedAction, createTask);
-router.route("/tms/promoteTask").post(isAuthenticatedUser, isPermittedAction, promoteTask);
-router.route("/tms/demoteTask").post(isAuthenticatedUser, isPermittedAction, demoteTask);
-router.route("/tms/updateTask").post(isAuthenticatedUser, isPermittedAction, updateTask);
+router.route("/tms/app/createTask").post(isAuthenticatedUser, isPermittedAction, createTask);
+router.route("/tms/app/promoteTask").post(isAuthenticatedUser, isPermittedAction, promoteTask);
+router.route("/tms/app/demoteTask").post(isAuthenticatedUser, isPermittedAction, demoteTask);
+router.route("/tms/app/updateTask").post(isAuthenticatedUser, isPermittedAction, updateTask);
 
 module.exports = router;

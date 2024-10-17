@@ -89,8 +89,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60vw;
-    height: 50vh;
+    width: 70vw;
+    height: 60vh;
+    overflow-y: auto; /* Enable vertical scrolling inside modal */
     padding: 15px;
     border-radius: 5px;
     background-color: rgb(255, 255, 255);

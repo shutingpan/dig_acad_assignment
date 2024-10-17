@@ -47,7 +47,7 @@
   // Get task details
   onMount(async () => {
     try {
-      const response = await axios.post('http://localhost:3000/tms/getTask', {
+      const response = await axios.post('http://localhost:3000/tms/app/task', {
         appName, 
         taskId: task.task_id
       }, {
@@ -72,7 +72,7 @@
   // Promotable: Open || Todo || Doing || Done
   async function promoteTask() {
     try {
-      const response = await axios.post('http://localhost:3000/tms/promoteTask', {
+      const response = await axios.post('http://localhost:3000/tms/app/promoteTask', {
         taskId: task.task_id,
         newNote
       }, {
@@ -92,7 +92,7 @@
   // Demotable: Doing || Done
   async function demoteTask() {
     try {
-      const response = await axios.post('http://localhost:3000/tms/demoteTask', {
+      const response = await axios.post('http://localhost:3000/tms/app/demoteTask', {
         taskId: task.task_id,
         newNote,
         selectedPlan
@@ -112,7 +112,7 @@
 
   async function saveTask() {
       try {
-        const response = await axios.post('http://localhost:3000/tms/updateTask', {
+        const response = await axios.post('http://localhost:3000/tms/app/updateTask', {
           taskId: task.task_id,
           newNote,
           selectedPlan

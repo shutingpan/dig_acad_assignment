@@ -24,7 +24,7 @@
   // Populate plans dropdown
   onMount(async () => {
     try {
-      const response = await axios.post(`http://localhost:3000/tms/plans`, {
+      const response = await axios.post(`http://localhost:3000/tms/app/plans`, {
         appName
       } ,{
         headers: {
@@ -48,7 +48,7 @@
   // Create task & return to taskboard
   async function createTask() {
     try {
-      const response = await axios.post('http://localhost:3000/tms/createTask', {
+      const response = await axios.post('http://localhost:3000/tms/app/createTask', {
         newTask
       }, {
         headers: {
