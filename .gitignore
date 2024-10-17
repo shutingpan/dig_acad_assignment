@@ -8,3 +8,6 @@
 # Stores VSCode versions used for testing VSCode extensions
 */.vscode-test/
 */.vscode/
+
+# Ignore sensitive info & environment variables
+*/backend/config/config.env
