@@ -1,1 +1,1 @@
-project backup
+project backup (ignore zip files)
