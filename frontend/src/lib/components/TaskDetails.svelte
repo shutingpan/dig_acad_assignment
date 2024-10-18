@@ -1,11 +1,22 @@
-<script>
+<script lang="ts">
   import { goto } from "$app/navigation";
   import axios from "axios";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
 
   // For loading task details
-  export let task = {};
+  export let task = {
+    task_id: "",
+    task_name: "",
+    task_plan: "",
+    task_state: "",
+    task_owner: "",
+    task_creator: "",
+    task_createdate: "",
+    task_description: "",
+    task_notes: ""
+  };
+
   export let appName = ""; // Dont actually need this anymore when hv taskid
 
   // Permissions
@@ -19,7 +30,7 @@
   let newNote = "";
 
   // For detecting changes
-  let plans = [];
+  let plans: string[] = [];
   let origPlan = task.task_plan;
   let selectedPlan = task.task_plan;
   let isPlanChanged = false, isNoChange = false;
@@ -61,7 +72,7 @@
         task = response.data.task;
         plans = response.data.planList;
       }
-    } catch (err) {
+    } catch (err : any) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
       } else {
@@ -90,7 +101,7 @@
       if (response.data.success) {
         dispatch('promote-task', response.data); 
       }
-    } catch (err) {
+    } catch (err : any) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
       } else {
@@ -115,7 +126,7 @@
       if (response.data.success){
         dispatch('demote-task', response.data);
       }
-    } catch (err) {
+    } catch (err : any) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
       } else {
@@ -139,7 +150,7 @@
         if (response.data.success) {
           dispatch('save-task', response.data);
         }
-      } catch (err) {
+      } catch (err : any) {
         if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
       } else {
@@ -205,8 +216,7 @@
 
           <div class="field-container field-textarea">
             <span><strong>Description</strong></span>
-            <!-- <pre>{task.task_description}</pre> -->
-            <textarea value={task.task_description} rows="10" cols="35" style="resize: none;" disabled></textarea>
+            <pre>{task.task_description}</pre>
           </div>   
 
     </div>
@@ -326,6 +336,10 @@
   strong {
     display: inline-block;
     min-width: 120px;
+  }
+
+  pre {
+    white-space: pre-wrap; /* enable line wrapping */
   }
 
   textarea {

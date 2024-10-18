@@ -14,7 +14,7 @@
     task_notes: "",
     task_plan: "",
     task_app_acronym: appName,
-    task_state: "Open",
+    task_state: "-",
     task_creator: "Me",
     task_owner: "Me",
   };

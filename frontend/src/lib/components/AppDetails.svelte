@@ -133,5 +133,9 @@
     display: inline-block;
     min-width: 115px;
   }
+
+  pre {
+    white-space: pre-wrap; /* enable line wrapping */
+  }
   
 </style>

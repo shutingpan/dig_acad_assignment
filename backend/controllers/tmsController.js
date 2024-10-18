@@ -12,7 +12,7 @@ const taskName_RegEx = /^[a-zA-Z0-9]+$/;
 function stampNotes(newNote, currentNotes, owner, taskState) {
   // Stamp with username, datetime and task state
   const dateTimestamp = new Date().toISOString().slice(0, 10) + " " + new Date().toLocaleTimeString();
-  return `**********\n${owner} on ${dateTimestamp}\nState: ${taskState}\n\n` + newNote + "\n\n" + currentNotes;
+  return `**********\nUser: ${owner} | State: ${taskState} | ${dateTimestamp}\n\n` + newNote + "\n\n" + currentNotes;
 }
 
 // Returns app list, group list, & PL [hardcoded] status
@@ -269,7 +269,7 @@ exports.createTask = async (req, res) => {
 
     // Stamp notes (if any)
     if (newTask.task_notes.trim() !== "") {
-      newTask.task_notes = stampNotes(newTask.task_notes, "", username, "Open");
+      newTask.task_notes = stampNotes(newTask.task_notes, "", username, "-");
     }
 
     // Get creation date
@@ -288,7 +288,7 @@ exports.createTask = async (req, res) => {
 
     const updateRnumberQuery = "UPDATE application SET app_rnumber = ? WHERE app_acronym =?";
     const insertNewTaskQuery = "INSERT INTO task VALUES (?,?,?,?,?,?,?,?,?,?)";
-    const insertFields = [newTask.task_name, newTask.task_description, newTask.task_notes, task_id, newTask.task_plan, newTask.task_app_acronym, newTask.task_state, username, username, createDate];
+    const insertFields = [newTask.task_name, newTask.task_description, newTask.task_notes, task_id, newTask.task_plan, newTask.task_app_acronym, "Open", username, username, createDate];
 
     // BEGIN TRANSACTION
     db.beginTransaction(async err => {
@@ -323,7 +323,7 @@ exports.createTask = async (req, res) => {
             });
           }
           console.log("Transaction Complete! New task:", newTask, "task_id:", task_id);
-          return res.json({ success: true, message: "Task created successfully: " + newTask.task_name, createdTask: { task_id: task_id, task_name: newTask.task_name, task_plan: newTask.task_plan, task_owner: username, task_state: newTask.task_state } });
+          return res.json({ success: true, message: "Task created successfully: " + newTask.task_name, createdTask: { task_id: task_id, task_name: newTask.task_name, task_plan: newTask.task_plan, task_owner: username, task_state: "Open" } });
         });
       } catch (error) {
         // Rollback the transaction on error
@@ -454,9 +454,13 @@ exports.promoteTask = async (req, res) => {
         subject: "Task Pending Review",
         text: `Dear Team,
         A task in the Task Management System requires your review and approval.
+
+        ID: ${taskId}
+
         Please log in to the system and review the task at your earliest convenience.`,
         html: `<p>Dear Team,</p>
         <p>A task in the <strong>Task Management System</strong> requires your review and approval.</p>
+        <p>ID: ${taskId}</p>
         <p>Please log in to the system and review the task at your earliest convenience.</p>`
       };
 
