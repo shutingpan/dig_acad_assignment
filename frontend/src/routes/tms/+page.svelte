@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
     import { goto } from "$app/navigation";
     import axios from "axios";
     import { onMount } from "svelte";
@@ -83,7 +83,11 @@
             if (err.response && err.response.status === 401) {
                 goto('/login'); // Unauthorized 
             } else if (err.response && err.response.status === 403) {
-                location.reload();
+                 // User without PL permissions
+                isCreated = err.response.data.success;
+                createMsg = err.response.data.message;
+                setTimeout(() => {createMsg=""}, 3000);
+                isPL = false;
             } else {
                 console.error("An error occurred: ", err);
             }
@@ -222,55 +226,7 @@
             </tbody>
         </table>
     </form>
-    
-    <!-- Frontend testing -->
-     <!-- <div class="app-container">
-        {#each apps as app}
-          <div class="app-card">
-            <h3>{app.app_acronym}</h3>
-            <p>Start date: {app.app_startdate}</p>
-            <p>End date: {app.app_enddate}</p>
-            <p class="app-description">{app.app_description}</p>
-          </div>
-        {/each}
-      </div> -->
-
 <style>
-
-/* .app-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 20px;
-    background-color: #ebebeb;
-  }
-
-  .app-card {
-    background-color: #ffffff;
-    border-radius: 3px;
-    border: none;
-    padding: 15px;
-    text-align: left;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-  }
-
-  .app-card:hover {
-    border: solid 1px rgb(99, 99, 99);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-  }
-
-  .app-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  } 
-
-*/
-
     .app-description {
         white-space: nowrap;
         overflow: hidden;

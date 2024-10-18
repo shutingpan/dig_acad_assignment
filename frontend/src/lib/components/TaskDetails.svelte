@@ -28,6 +28,7 @@
   // For task actions
   let promoteAction = "", demoteAction = "";
   let newNote = "";
+  let errMsg = "";
 
   // For detecting changes
   let plans: string[] = [];
@@ -100,10 +101,16 @@
 
       if (response.data.success) {
         dispatch('promote-task', response.data); 
+      } else {
+        errMsg = response.data.message;
+        setTimeout(()=> {errMsg=""}, 4000);
       }
     } catch (err : any) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
+      } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
+          errMsg = err.response.data.message;
+          setTimeout(()=> {errMsg=""}, 4000);
       } else {
           console.error("An error occurred: ", err);
       }
@@ -125,11 +132,17 @@
 
       if (response.data.success){
         dispatch('demote-task', response.data);
+      } else {
+        errMsg = response.data.message;
+        setTimeout(()=> {errMsg=""}, 4000);
       }
     } catch (err : any) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
-      } else {
+        } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
+          errMsg = err.response.data.message;
+          setTimeout(()=> {errMsg=""}, 4000);     
+        } else {
           console.error("An error occurred: ", err);
       }
     }
@@ -149,11 +162,17 @@
 
         if (response.data.success) {
           dispatch('save-task', response.data);
+        } else {
+          errMsg = response.data.message;
+          setTimeout(()=> {errMsg=""}, 4000);
         }
       } catch (err : any) {
         if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
-      } else {
+        } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
+          errMsg = err.response.data.message;
+          setTimeout(()=> {errMsg=""}, 4000);
+        } else {
           console.error("An error occurred: ", err);
       }
       }
@@ -165,6 +184,11 @@
 
   <div class="modal-content">
     <button class="close-button" on:click={closeModal}>x</button>
+
+    <!-- Error Notification -->
+    {#if errMsg}
+      <span class= "errorMsg notification">{errMsg}</span>
+    {/if}
 
     <div class="modal-content-section">
           <!-- Task Details -->
@@ -378,6 +402,27 @@
     background-color: #dddddd; 
     color: #a3a3a3; 
     cursor: not-allowed; 
+  }
+
+  .errorMsg {
+      display: block;
+      background-color: rgb(255, 193, 193);
+      color: red;
+      font-size: medium;
+      min-height: 1rem;
+      margin: 5px 0px;
+      padding: 5px;
+      border-radius: 3px;
+  }
+
+  .notification {
+      position: fixed;
+      top: 0px;
+      left: 25%; 
+      width: 50%;
+      text-align: center;
+      z-index: 1000; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
 </style>

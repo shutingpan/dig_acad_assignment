@@ -76,6 +76,12 @@
     } catch (err) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
+      } else if(err.response && err.response.status === 403) {
+          // User without PM permissions
+          isCreated = err.response.data.success;
+          createMsg = err.response.data.message;
+          setTimeout(() => {createMsg=""}, 3000);
+          isPM = false;
       } else {
           console.error("An error occurred: ", err);
       }

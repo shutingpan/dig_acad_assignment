@@ -69,6 +69,8 @@
     } catch (err) {
       if (err.response && err.response.status === 401) {
           goto('/login'); // Unauthorized 
+      } else if (err.response && err.response.status === 403 || err.response && err.response.status === 500 ) {
+          errMsg = err.response.data.message; // Not permitted or internal error
       } else {
           console.error("An error occurred: ", err);
       }

@@ -140,7 +140,7 @@ exports.createPlan = async (req, res) => {
   const newPlanFields = [newPlan.plan_mvp_name, newPlan.plan_startdate, newPlan.plan_enddate, appName, newPlan.plan_colour];
 
   try {
-    // Check plan is unique under app
+    // Check if plan alr exist under app
     const isNewPlan = await new Promise((resolve, reject) => {
       db.query(checkNewPlanQuery, [appName, newPlan.plan_mvp_name], (error, results) => {
         if (error) return reject(error);
@@ -151,6 +151,7 @@ exports.createPlan = async (req, res) => {
     if (!isNewPlan) {
       return res.json({ success: false, message: "Plan already exists for " + appName });
     } else if (planMVPName_RegEx.test(newPlan.plan_mvp_name)) {
+      // Create new plan
       await new Promise((resolve, reject) => {
         db.query(insertPlanQuery, newPlanFields, error => {
           if (error) return reject(error);
@@ -335,7 +336,7 @@ exports.createTask = async (req, res) => {
     });
   } catch (err) {
     console.error("Error occurred: ", err);
-    return res.status(500).json({ success: false, message: "Cannot create task" });
+    return res.json({ success: false, message: "Cannot create task" });
   }
 };
 
@@ -476,7 +477,7 @@ exports.promoteTask = async (req, res) => {
     return res.json({ success: true, message: "Task promoted: " + taskId, promotedTask });
   } catch (err) {
     console.error("Error occurred: ", err);
-    return res.json({ success: false, message: "Cannot promote task" });
+    return res.json({ success: false, message: "Error occurred while promoting task" });
   }
 };
 
@@ -650,6 +651,6 @@ exports.isPermittedAction = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("Error occurred: ", err);
-    return res.json({ success: false, message: "Cannot permit user." });
+    return res.status(500).json({ success: false, message: "Cannot permit user." });
   }
 };
