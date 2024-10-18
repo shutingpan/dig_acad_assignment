@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation";
   import axios from "axios";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
@@ -33,38 +34,54 @@
         console.log("Error occurred when fetching plan list.");
       }
     } catch (err) {
-        console.error("Error occurred: ", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   });
  
   async function createPlan() {
-    const response = await axios.post("http://localhost:3000/tms/app/createPlan", {
-      appName,
-      newPlan
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }, withCredentials: true
-    });
 
-    if (response.data.success) {
-      // Notification
-      isCreated = response.data.success;
-      createMsg = response.data.message;
-      setTimeout(() => {createMsg=""}, 3000);
-      // Add new entry in plans (table and taskboard)
-      plans = [{...newPlan}, ...plans];
-      dispatch('create-plan', newPlan);
-      // Reset inputs
-      newPlan.plan_mvp_name = ''; 
-      newPlan.plan_startdate = ''; 
-      newPlan.plan_enddate = '';
-      newPlan.plan_colour = '#ffffff';
-    } else {
-      isCreated = response.data.success;
-      createMsg = response.data.message;
-      setTimeout(() => {createMsg=""}, 3000);
+    try {
+      const response = await axios.post("http://localhost:3000/tms/app/createPlan", {
+        appName,
+        newPlan
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }, withCredentials: true
+      });
+
+      if (response.data.success) {
+        // Notification
+        isCreated = response.data.success;
+        createMsg = response.data.message;
+        setTimeout(() => {createMsg=""}, 3000);
+        // Add new entry in plans (table and taskboard)
+        plans = [{...newPlan}, ...plans];
+        dispatch('create-plan', newPlan);
+        // Reset inputs
+        newPlan.plan_mvp_name = ''; 
+        newPlan.plan_startdate = ''; 
+        newPlan.plan_enddate = '';
+        newPlan.plan_colour = '#ffffff';
+      } else {
+        isCreated = response.data.success;
+        createMsg = response.data.message;
+        setTimeout(() => {createMsg=""}, 3000);
+      }
+
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
+
     }
+    
   }
 
   function closeModal() {

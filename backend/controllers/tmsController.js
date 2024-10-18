@@ -369,12 +369,12 @@ exports.getTask = async (req, res) => {
   }
 };
 
-// Changes: task state, notes (if any) and owner
+// Changes: task state, notes (if any), plan (at Open) and owner
 exports.promoteTask = async (req, res) => {
   const username = req.username;
-  const { taskId, newNote } = req.body;
+  const { taskId, newNote, selectedPlan } = req.body;
   const getTaskQuery = "SELECT * FROM task WHERE task_id = ?";
-  let promoteTaskQuery = "UPDATE task SET task_state=?, task_notes=?, task_owner=? WHERE task_id=?";
+  let promoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_notes=?, task_owner=? WHERE task_id=?";
   let updatedNotes = "";
   let promotedState;
 
@@ -407,13 +407,13 @@ exports.promoteTask = async (req, res) => {
     if (newNote.trim() !== "") {
       // With stamped new note
       updatedNotes = stampNotes(newNote, task.task_notes, username, task.task_state);
-      db.query(promoteTaskQuery, [promotedState, updatedNotes, username, taskId], error => {
+      db.query(promoteTaskQuery, [promotedState, selectedPlan, updatedNotes, username, taskId], error => {
         if (error) throw error;
       });
     } else {
       // No new note
-      promoteTaskQuery = "UPDATE task SET task_state=?, task_owner=? WHERE task_id=?";
-      db.query(promoteTaskQuery, [promotedState, username, taskId], error => {
+      promoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_owner=? WHERE task_id=?";
+      db.query(promoteTaskQuery, [promotedState, selectedPlan, username, taskId], error => {
         if (error) throw error;
       });
     }
@@ -423,7 +423,7 @@ exports.promoteTask = async (req, res) => {
       task_id: taskId,
       task_name: task.task_name,
       task_owner: username,
-      task_plan: task.task_plan,
+      task_plan: selectedPlan,
       task_state: promotedState
     };
 
@@ -536,7 +536,7 @@ exports.demoteTask = async (req, res) => {
   }
 };
 
-// Changes: plan (only effective at done state), notes (if any) and owner
+// Changes: plan (only effective at Open state), notes (if any) and owner
 exports.updateTask = async (req, res) => {
   const username = req.username;
   const { taskId, newNote, selectedPlan } = req.body;

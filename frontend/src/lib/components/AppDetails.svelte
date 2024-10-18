@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation";
   import axios from "axios";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
@@ -35,7 +36,11 @@
         console.log("Error occurred when fetching app information.");
       }
     } catch (err) {
-        console.error("Error occurred: ", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   });
  
@@ -65,9 +70,9 @@
     </div>
 
     <div class="modal-content-section">         
-        <div class="field-textarea">
+        <div>
           <p><strong>Description</strong></p>
-          <textarea value={app.app_description} rows="10" cols="35" style="resize: none;" disabled></textarea>
+          <pre>{app.app_description}</pre>
         </div>
     </div>
 
@@ -122,16 +127,6 @@
 
   .modal-content-section:last-child {
     flex-basis: 60%;
-  }
-
-  .field-textarea {
-    display: flex;
-    flex-direction: column;
-   }
-
-  .field-textarea textarea {
-    width: 100%; 
-    margin-top: 10px; /* Add some space between the label and the textarea */
   }
 
   strong {

@@ -57,9 +57,10 @@
       } 
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        goto("/login");
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
       }
-      console.log("Error occurred: ", err);
     }
   });
 

@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation";
   import axios from "axios";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
@@ -61,7 +62,11 @@
         plans = response.data.planList;
       }
     } catch (err) {
-      console.error("Error occurred:", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   });
 
@@ -74,7 +79,8 @@
     try {
       const response = await axios.post('http://localhost:3000/tms/app/promoteTask', {
         taskId: task.task_id,
-        newNote
+        newNote,
+        selectedPlan
       }, {
         headers: {
           "Content-Type": "application/json"
@@ -85,7 +91,11 @@
         dispatch('promote-task', response.data); 
       }
     } catch (err) {
-      console.error("Error occurred:", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   }
 
@@ -106,7 +116,11 @@
         dispatch('demote-task', response.data);
       }
     } catch (err) {
-      console.error("Error occurred:", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   }
 
@@ -126,7 +140,11 @@
           dispatch('save-task', response.data);
         }
       } catch (err) {
-        console.error("Error occurred: ", err);
+        if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
       }
   }
 
@@ -152,12 +170,12 @@
           <div class="field-container">
             <span><strong>Plan:</strong></span>
 
-            <!-- Plan can only be changed by owner at Done state -->
-            {#if (taskDone && task.task_state === "Done")}
+            <!-- Plan can only be changed by owner at Open and Done state -->
+            {#if (taskOpen && task.task_state === "Open" || taskDone && task.task_state === "Done")}
                 <select bind:value={selectedPlan}>
-                  <option value="" disabled>Select plan (if any)</option>
+                  <option value="">No plan</option>
                   {#each plans as planMVPName}
-                      <option value={planMVPName} selected={planMVPName === task.task_plan}>{planMVPName}</option>
+                      <option value={planMVPName}>{planMVPName}</option>
                   {/each}
                 </select> 
             {:else}
@@ -187,6 +205,7 @@
 
           <div class="field-container field-textarea">
             <span><strong>Description</strong></span>
+            <!-- <pre>{task.task_description}</pre> -->
             <textarea value={task.task_description} rows="10" cols="35" style="resize: none;" disabled></textarea>
           </div>   
 
@@ -211,11 +230,11 @@
                   <button class="neg-btn" on:click={demoteTask}>{demoteAction}</button>
                 {/if}
                 {#if promoteAction}
-                  <!-- Disabled if plan changes -->
-                  <button class="pos-btn" on:click={promoteTask} disabled={isPlanChanged}>{promoteAction}</button>
+                  <!-- Disabled if plan changes at Done state but not at Open state-->
+                  <button class="pos-btn" on:click={promoteTask} disabled={isPlanChanged && task.task_state !== "Open"}>{promoteAction}</button>
                 {/if}
-                <!-- Disabled if changes not made -->
-                <button on:click={saveTask} disabled={isNoChange}>Save Changes</button>
+                <!-- Disabled if changes not made (any state) or if plan changes at Done state -->
+                <button on:click={saveTask} disabled={isNoChange || isPlanChanged && task.task_state === "Done"}>Save Changes</button>
                 <button on:click={closeModal}>Cancel</button>
               </div>
           {:else}

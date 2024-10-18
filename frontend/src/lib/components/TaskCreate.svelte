@@ -1,4 +1,5 @@
 <script>
+  import { goto } from "$app/navigation";
   import axios from "axios";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
@@ -36,7 +37,11 @@
         plans = response.data.plans;
       }
     } catch (err) {
-      console.error("Error occurred: ", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   });
 
@@ -62,7 +67,11 @@
         errMsg = response.data.message;
       }
     } catch (err) {
-      console.error("Error occurred: ", err);
+      if (err.response && err.response.status === 401) {
+          goto('/login'); // Unauthorized 
+      } else {
+          console.error("An error occurred: ", err);
+      }
     }
   }
 
@@ -94,7 +103,7 @@
             <div class="field-container">
               <span><strong>Plan:</strong></span>
               <select bind:value={newTask.task_plan}>
-                <option value="" selected disabled>Select plan (if any)</option>
+                <option value="" selected>No plan</option>
                 {#each plans as plan}
                   <option value={plan.plan_mvp_name}>{plan.plan_mvp_name}</option>
                 {/each}
