@@ -217,7 +217,9 @@
                         <td>{app.app_permit_todolist}</td>
                         <td>{app.app_permit_doing}</td>
                         <td>{app.app_permit_done}</td>
-                        <td class="app-description">{app.app_description}</td>
+                        <td class="app-description">
+                            <textarea value={app.app_description} rows="7" cols="40" disabled></textarea>
+                        </td>
                         <td>
                             <button class="open-btn" type="button" on:click={() => goToApp(app.app_acronym)}>Open</button>
                         </td>
@@ -227,11 +229,12 @@
         </table>
     </form>
 <style>
-    .app-description {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100px;
+    .app-description textarea{
+        resize: vertical;
+        /* white-space: nowrap; */
+        /* overflow: hidden; */
+        /* text-overflow: ellipsis; */
+        /* max-width: 100px; */
     } 
 
     .header {

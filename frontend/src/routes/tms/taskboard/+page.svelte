@@ -146,12 +146,7 @@
   }
 
   function saveTask(event) {
-    closeModal();
-    // Notification
-    isSuccess = event.detail.success;
-    notifMsg = event.detail.message;
-    setTimeout(()=> {notifMsg=""}, 4000);
-    // Find task by taskid, update owner and plan
+    // Replace old task with updated task
     const updatedTask = event.detail.updatedTask;
     switch (updatedTask.task_state) {
       case "Open": 

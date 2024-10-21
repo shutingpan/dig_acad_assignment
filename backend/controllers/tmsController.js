@@ -581,7 +581,7 @@ exports.updateTask = async (req, res) => {
     };
 
     // Send response
-    return res.json({ success: true, message: "Saved changes for " + taskId, updatedTask });
+    return res.json({ success: true, message: "Saved changes for " + taskId, updatedTask, updatedNotes });
   } catch (err) {
     console.error("Error occurred: ", err);
     return res.json({ success: false, message: "Cannot save changes." });

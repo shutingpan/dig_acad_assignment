@@ -28,7 +28,7 @@
   // For task actions
   let promoteAction = "", demoteAction = "";
   let newNote = "";
-  let errMsg = "";
+  let errMsg = "", isSuccess = false;
 
   // For detecting changes
   let plans: string[] = [];
@@ -161,6 +161,22 @@
         });
 
         if (response.data.success) {
+          // Notification
+          errMsg = response.data.message;
+          isSuccess = response.data.success;
+          setTimeout(()=> {errMsg=""; isSuccess = false;}, 4000);
+          // Update owner
+          task.task_owner = response.data.updatedTask.task_owner;
+          // Update notes (if any)
+          if (response.data.updatedNotes) {
+            task.task_notes = response.data.updatedNotes;
+          }
+          // Update plan (if any)
+          task.task_plan = response.data.updatedTask.task_plan;
+          // Reset to saved changes
+          origPlan = response.data.updatedTask.task_plan;
+          selectedPlan = response.data.updatedTask.task_plan;
+          newNote = "";
           dispatch('save-task', response.data);
         } else {
           errMsg = response.data.message;
@@ -187,7 +203,7 @@
 
     <!-- Error Notification -->
     {#if errMsg}
-      <span class= "errorMsg notification">{errMsg}</span>
+      <span class= "errorMsg notification" style="color: {isSuccess? 'green': 'red'}; background-color: {isSuccess? 'rgb(171, 230, 167)':'rgb(255, 193, 193)'}">{errMsg}</span>
     {/if}
 
     <div class="modal-content-section">
