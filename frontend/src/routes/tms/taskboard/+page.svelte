@@ -11,13 +11,13 @@
   // For app information
   const appName = localStorage.getItem("appName");
 
-  // For viewing existing tasks
+  // For viewing existing task
   let selectedTask = {};
-  // Plan-colour pairs
+  // For colour coding based on plan-colour pairs
   let planColours = {};
   // For viewing modals
   let activeModal = "";
-  // For creating tasks
+  // For task action permissions
   let taskCreate = false, taskOpen = false, taskTodo = false, taskDoing = false, taskDone = false;
   // For task columns 
   let openTasks = [];
@@ -28,7 +28,6 @@
   // For notification
   let isSuccess = false, notifMsg = "";
 
-  // Get info: User permits, tasks under this app, plan-colour pairings.
   onMount(async () => {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/taskboard', {
@@ -47,7 +46,7 @@
         taskDoing = response.data.permits.taskDoing;
         taskDone = response.data.permits.taskDone;
 
-        // Taskboard data
+        // Taskboard data - plan colours & task columns
         planColours = response.data.planColPairs;
         openTasks = response.data.openTasks;
         todoTasks = response.data.todoTasks;
@@ -135,14 +134,9 @@
     planColours[event.detail.plan_mvp_name] = event.detail.plan_colour;
   }
 
-  // Update open column with new task
   function createTask(event) {
-    closeModal();
+    // Update open column with new task
     openTasks = [event.detail.createdTask, ...openTasks];
-    // Notification
-    isSuccess = event.detail.success;
-    notifMsg = event.detail.message;
-    setTimeout(()=> {notifMsg=""}, 4000);
   }
 
   function saveTask(event) {
@@ -286,6 +280,7 @@
     color: #333;
     border: none;
     background: none;
+    text-align: left;
     text-decoration: underline;
     cursor: pointer;
   }

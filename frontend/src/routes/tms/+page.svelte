@@ -103,7 +103,7 @@
 
 
     <div class="header">
-        <h1>App Dashboard</h1>
+        <h1>Apps Dashboard</h1>
     </div>
 
     <!-- Create App Notification -->
@@ -132,24 +132,24 @@
                 {#if isPL}
                     <!-- Create App -->
                     <tr>
-                        <!-- App Acronym -->
                         <td>
-                            <input type="text" bind:value={newApp.app_acronym} required>
+                            <!-- App Acronym -->
+                            <input type="text" bind:value={newApp.app_acronym} maxlength="50" required>
                         </td>
-                        <!-- Rnumber -->
                         <td>
+                            <!-- Rnumber -->
                             {newApp.app_rnumber}
                         </td>
-                        <!-- Start date -->
                         <td>
+                            <!-- Start date -->
                             <input type="date" bind:value={newApp.app_startdate} max="9999-12-31" required>
                         </td>
-                        <!-- End date -->
                         <td>
+                            <!-- End date -->
                             <input type="date" bind:value={newApp.app_enddate} max="9999-12-31" required>
                         </td>
-                        <!-- Permission: Create -->
                         <td>
+                            <!-- Permission: Create -->
                             <select bind:value={newApp.app_permit_create} required>
                                 <option value="" disabled selected>Select a group</option>
                                 {#each groups as group}
@@ -157,8 +157,8 @@
                                 {/each}
                             </select>
                         </td>
-                        <!-- Permission: Open -->
                         <td>
+                            <!-- Permission: Open -->
                             <select bind:value={newApp.app_permit_open} required>
                                 <option value="" disabled selected>Select a group</option>
                                 {#each groups as group}
@@ -166,8 +166,8 @@
                                 {/each}
                             </select>
                         </td>
-                        <!-- Permission: To Do -->
                         <td>
+                            <!-- Permission: To Do -->
                             <select bind:value={newApp.app_permit_todolist} required>
                                 <option value="" disabled selected>Select a group</option>
                                 {#each groups as group}
@@ -175,8 +175,8 @@
                                 {/each}
                             </select>
                         </td>
-                        <!-- Permission: Doing -->
                         <td>
+                            <!-- Permission: Doing -->
                             <select bind:value={newApp.app_permit_doing} required>
                                 <option value="" disabled selected>Select a group</option>
                                 {#each groups as group}
@@ -184,8 +184,8 @@
                                 {/each}
                             </select>
                         </td>
-                        <!-- Permission: Done -->
                         <td>
+                            <!-- Permission: Done -->
                             <select bind:value={newApp.app_permit_done} required>
                                 <option value="" disabled selected>Select a group</option>
                                 {#each groups as group}
@@ -193,9 +193,9 @@
                                 {/each}
                             </select>
                         </td>
-                        <!-- Description -->
                         <td>
-                            <textarea placeholder="Enter a description (max 255 characters)..." rows="7" cols="40" maxlength="255" style="resize: none;" bind:value={newApp.app_description}></textarea>
+                            <!-- Description -->
+                            <textarea placeholder="Enter a description (max 255 characters)..." rows="7" cols="40" maxlength="255" style="resize: none; width:100%;" bind:value={newApp.app_description}></textarea>
                         </td>
                         <td>
                             <button class="create-btn" type="submit">Create</button>
@@ -218,7 +218,7 @@
                         <td>{app.app_permit_doing}</td>
                         <td>{app.app_permit_done}</td>
                         <td class="app-description">
-                            <textarea value={app.app_description} rows="7" cols="40" disabled></textarea>
+                            <textarea value={app.app_description} rows="5" disabled></textarea>
                         </td>
                         <td>
                             <button class="open-btn" type="button" on:click={() => goToApp(app.app_acronym)}>Open</button>
@@ -231,10 +231,7 @@
 <style>
     .app-description textarea{
         resize: vertical;
-        /* white-space: nowrap; */
-        /* overflow: hidden; */
-        /* text-overflow: ellipsis; */
-        /* max-width: 100px; */
+        width: 100%;
     } 
 
     .header {

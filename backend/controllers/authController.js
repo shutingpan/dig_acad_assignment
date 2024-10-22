@@ -84,6 +84,14 @@ exports.isAuthenticatedUser = async (req, res, next) => {
 
     isActive = activeResult[0].isActive;
     if (!isActive) {
+      // Clear token cookie
+      const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/"
+      };
+      res.clearCookie("token", options);
+      // Send response
       return res.status(401).json({ message: "Unauthorised user." });
     }
 

@@ -65,11 +65,11 @@ exports.createApp = async (req, res) => {
       });
     });
 
-    // Check app acronym passes regex
     if (!isNewApp) {
+      // If app alr exist
       return res.json({ success: false, message: "App already exists." });
     } else if (appAcronym_RegEx.test(newApp.app_acronym)) {
-      // Create new app in db
+      // If app acronym passes regex, create new app in db
       await new Promise((resolve, reject) => {
         db.query(insertAppQuery, newAppFields, error => {
           if (error) return reject(error);
@@ -342,20 +342,20 @@ exports.createTask = async (req, res) => {
 
 // Returns task details and plan list under app
 exports.getTask = async (req, res) => {
-  const { appName, taskId } = req.body;
-  const getTaskQuery = "SELECT * FROM task WHERE task_app_acronym=? AND task_id=?";
+  const { taskId } = req.body;
+  const getTaskQuery = "SELECT * FROM task WHERE task_id=?";
   const getPlansQuery = "SELECT plan_mvp_name FROM plan WHERE plan_app_acronym=?";
 
   try {
     const task = await new Promise((resolve, reject) => {
-      db.query(getTaskQuery, [appName, taskId], (error, results) => {
+      db.query(getTaskQuery, [taskId], (error, results) => {
         if (error) return reject(error);
         resolve(results[0]);
       });
     });
 
     const plans = await new Promise((resolve, reject) => {
-      db.query(getPlansQuery, [appName], (error, results) => {
+      db.query(getPlansQuery, [task.task_app_acronym], (error, results) => {
         if (error) return reject(error);
         resolve(results);
       });

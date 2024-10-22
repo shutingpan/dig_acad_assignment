@@ -17,7 +17,7 @@
     task_notes: ""
   };
 
-  export let appName = ""; // Dont actually need this anymore when hv taskid
+  // export let appName = ""; // Dont actually need this anymore when hv taskid
 
   // Permissions
   export let taskOpen = false;
@@ -61,7 +61,7 @@
   onMount(async () => {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/task', {
-        appName, 
+        // appName, 
         taskId: task.task_id
       }, {
         headers: {

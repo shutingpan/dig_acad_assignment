@@ -20,7 +20,7 @@
   };
 
   let plans = [];
-  let errMsg = ""; 
+  let errMsg = "", isSuccess = false; 
 
   // Populate plans dropdown
   onMount(async () => {
@@ -62,8 +62,19 @@
       });
 
       if (response.data.success) {
+        // Notification
+        isSuccess = response.data.success;
+        errMsg = response.data.message;
+        setTimeout(() => {errMsg=""}, 4000);
+        // Reset inputs
+        newTask.task_name = "";
+        newTask.task_plan = "";
+        newTask.task_description = "";
+        newTask.task_notes = "";
+        // Dispatch event
         dispatch('createtask', response.data);
       } else {
+        isSuccess = response.data.success;
         errMsg = response.data.message;
       }
     } catch (err) {
@@ -89,12 +100,12 @@
           <!-- Create Task -->
             <div class="field-container" >
               <span><strong>Task name:</strong></span>
-              <input type="text" bind:value={newTask.task_name} required on:focus={()=> errMsg=""}/> 
+              <input type="text" maxlength="50" bind:value={newTask.task_name} required on:focus={()=> errMsg=""}/> 
             </div>
 
             <!-- Error msgs -->
             {#if errMsg}
-              <span class="errorMsg">{errMsg}</span>
+              <span class="errorMsg" style="color: {isSuccess? 'green': 'red'}; background-color: {isSuccess? 'rgb(171, 230, 167)':'rgb(255, 193, 193)'}">{errMsg}</span>
             {/if}
     
             <div class="field-container">
