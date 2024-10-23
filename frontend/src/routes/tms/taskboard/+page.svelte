@@ -179,7 +179,6 @@
 <div class="header">
   <div class="app-info">
     <h2>{appName}</h2>
-    <!-- <button class="view-app-btn" on:click={()=> openModal('app')}>View App Details</button> -->
   </div>
   
   <div class="button-group">
@@ -243,11 +242,6 @@
   taskDone={taskDone}/>
 {/if}
 
-<!-- View App Details -->
-<!-- {#if activeModal === 'app'}
-  <AppDetails appName={appName} on:closeapp={closeModal}/>
-{/if} -->
-
 <!-- View Plans -->
 {#if activeModal === 'plan'}
   <PlanDetails appName={appName} on:closeplan={closeModal} on:create-plan={createPlan}/>
@@ -279,18 +273,6 @@
     margin: 0 12px 0 0;
     font-size: 28px;
   }
-
-  /* .view-app-btn {
-    margin: 10px 0px;
-    padding: 0px;
-    font-size: 15px;
-    color: #333;
-    border: none;
-    background: none;
-    text-align: left;
-    text-decoration: underline;
-    cursor: pointer;
-  } */
 
   .button-group {
     display: flex;

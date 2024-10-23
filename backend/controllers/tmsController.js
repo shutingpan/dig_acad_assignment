@@ -88,27 +88,6 @@ exports.createApp = async (req, res) => {
   }
 };
 
-// Given app acronym - Return app
-exports.getAppDetails = async (req, res) => {
-  const { appName } = req.body;
-  const getAppQuery = "SELECT * FROM application WHERE app_acronym=?";
-
-  try {
-    // Get app
-    const app = await new Promise((resolve, reject) => {
-      db.query(getAppQuery, [appName], (error, results) => {
-        if (error) return reject(error);
-        resolve(results[0]);
-      });
-    });
-    // Send response
-    return res.json({ success: true, app });
-  } catch (err) {
-    console.error("Error occurred: ", err);
-    return res.json({ success: false, message: "Failed to get app details." });
-  }
-};
-
 // Given app acronym - Return plan list & PM [hardcoded] status
 exports.getAllPlans = async (req, res) => {
   const username = req.username;
@@ -280,20 +259,6 @@ exports.createTask = async (req, res) => {
   const username = req.username;
 
   try {
-    // Check unique & valid task name under app
-    // const isTaskExist = await new Promise((resolve, reject) => {
-    //   db.query("SELECT * FROM task WHERE task_app_acronym =? AND task_name=?", [newTask.task_app_acronym, newTask.task_name], (error, results) => {
-    //     if (error) return reject(error);
-    //     resolve(results.length > 0);
-    //   });
-    // });
-
-    // if (isTaskExist) {
-    //   return res.json({ success: false, message: "Task already exists" });
-    // } else if (!taskName_RegEx.test(newTask.task_name)) {
-    //   return res.json({ success: false, message: "Invalid task name" });
-    // }
-
     if (!taskName_RegEx.test(newTask.task_name)) {
       return res.json({ success: false, message: "Invalid task name" });
     }

@@ -1,7 +1,7 @@
 const express = require("express");
 const { getAllUsers, createGroup, createUser, updateEmail, updatePassword, editUser, getProfile } = require("../controllers/adminController");
 const { loginUser, logoutUser, isAuthenticatedUser, authorizedGrps, isAdmin } = require("../controllers/authController");
-const { getAllApps, createApp, getAppDetails, getAllPlans, createPlan, getTaskboard, createTask, promoteTask, updateTask, demoteTask, isPermittedAction, getPlanList } = require("../controllers/tmsController");
+const { getAllApps, createApp, getAllPlans, createPlan, getTaskboard, createTask, promoteTask, updateTask, demoteTask, isPermittedAction, getPlanList } = require("../controllers/tmsController");
 const router = express.Router();
 
 // Check admin status
@@ -22,7 +22,6 @@ router.route("/profile/updatePassword").put(isAuthenticatedUser, updatePassword)
 
 // TMS - Apps
 router.route("/tms").get(isAuthenticatedUser, getAllApps);
-router.route("/tms/app").post(isAuthenticatedUser, getAppDetails);
 router.route("/tms/createApp").post(isAuthenticatedUser, authorizedGrps("pl"), createApp);
 
 // TMS - Plans
