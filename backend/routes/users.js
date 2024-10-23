@@ -1,7 +1,7 @@
 const express = require("express");
 const { getAllUsers, createGroup, createUser, updateEmail, updatePassword, editUser, getProfile } = require("../controllers/adminController");
 const { loginUser, logoutUser, isAuthenticatedUser, authorizedGrps, isAdmin } = require("../controllers/authController");
-const { getAllApps, createApp, getAppDetails, getAllPlans, createPlan, getTaskboard, createTask, getTask, promoteTask, updateTask, demoteTask, isPermittedAction } = require("../controllers/tmsController");
+const { getAllApps, createApp, getAppDetails, getAllPlans, createPlan, getTaskboard, createTask, promoteTask, updateTask, demoteTask, isPermittedAction, getPlanList } = require("../controllers/tmsController");
 const router = express.Router();
 
 // Check admin status
@@ -31,7 +31,7 @@ router.route("/tms/app/createPlan").post(isAuthenticatedUser, authorizedGrps("pm
 
 // TMS - Taskboard
 router.route("/tms/app/taskboard").post(isAuthenticatedUser, getTaskboard);
-router.route("/tms/app/task").post(isAuthenticatedUser, getTask);
+router.route("/tms/app/task").post(isAuthenticatedUser, getPlanList);
 
 // TMS - Task actions
 // Based on app-permits: block ability to view action (FE) & perform action (BE)

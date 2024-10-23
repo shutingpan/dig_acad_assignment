@@ -1,6 +1,6 @@
 <script> 
   import { goto } from "$app/navigation";
-  import AppDetails from "$lib/components/AppDetails.svelte";
+  // import AppDetails from "$lib/components/AppDetails.svelte";
   import PlanDetails from "$lib/components/PlanDetails.svelte";
   import TaskCard from "$lib/components/TaskCard.svelte";
   import TaskCreate from "$lib/components/TaskCreate.svelte";
@@ -29,6 +29,10 @@
   let isSuccess = false, notifMsg = "";
 
   onMount(async () => {
+    getTaskboard();
+  });
+
+  async function getTaskboard() {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/taskboard', {
         appName
@@ -61,7 +65,7 @@
           console.error("An error occurred: ", err);
       }
     }
-  });
+  }
 
   function promoteTask(event) {
     closeModal();
@@ -121,9 +125,11 @@
   function openModal(modal) {
     activeModal = modal;
   }
+
   function closeModal() {
     activeModal= "";
   }
+
   function viewTask(task) {
     selectedTask = task;
     openModal('task');
@@ -173,7 +179,7 @@
 <div class="header">
   <div class="app-info">
     <h2>{appName}</h2>
-    <button class="view-app-btn" on:click={()=> openModal('app')}>View App Details</button>
+    <!-- <button class="view-app-btn" on:click={()=> openModal('app')}>View App Details</button> -->
   </div>
   
   <div class="button-group">
@@ -224,12 +230,13 @@
 
 <!-- View a task -->
 {#if activeModal === 'task'}
-  <TaskDetails appName={appName} 
+  <TaskDetails
   task={selectedTask} 
   on:closetask={closeModal} 
   on:promote-task={promoteTask} 
   on:demote-task={demoteTask}
   on:save-task={saveTask}
+  on:reload-taskboard={getTaskboard}
   taskOpen={taskOpen} 
   taskTodo={taskTodo} 
   taskDoing={taskDoing} 
@@ -237,9 +244,9 @@
 {/if}
 
 <!-- View App Details -->
-{#if activeModal === 'app'}
+<!-- {#if activeModal === 'app'}
   <AppDetails appName={appName} on:closeapp={closeModal}/>
-{/if}
+{/if} -->
 
 <!-- View Plans -->
 {#if activeModal === 'plan'}
@@ -273,7 +280,7 @@
     font-size: 28px;
   }
 
-  .view-app-btn {
+  /* .view-app-btn {
     margin: 10px 0px;
     padding: 0px;
     font-size: 15px;
@@ -283,7 +290,7 @@
     text-align: left;
     text-decoration: underline;
     cursor: pointer;
-  }
+  } */
 
   .button-group {
     display: flex;

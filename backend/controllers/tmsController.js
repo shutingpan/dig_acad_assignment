@@ -168,11 +168,41 @@ exports.createPlan = async (req, res) => {
   }
 };
 
+// Returns plan list under app (for plan selection under task)
+exports.getPlanList = async (req, res) => {
+  const { taskId } = req.body;
+  const getTaskQuery = "SELECT * FROM task WHERE task_id=?";
+  const getPlansQuery = "SELECT plan_mvp_name FROM plan WHERE plan_app_acronym=?";
+
+  try {
+    const task = await new Promise((resolve, reject) => {
+      db.query(getTaskQuery, [taskId], (error, results) => {
+        if (error) return reject(error);
+        resolve(results[0]);
+      });
+    });
+
+    const plans = await new Promise((resolve, reject) => {
+      db.query(getPlansQuery, [task.task_app_acronym], (error, results) => {
+        if (error) return reject(error);
+        resolve(results);
+      });
+    });
+    // Format data into array of plan_mvp_name(s)
+    const planList = plans.map(rowData => rowData.plan_mvp_name);
+
+    return res.json({ success: true, planList });
+  } catch (err) {
+    console.error("Error occurred: ", err);
+    return res.json({ success: false, message: "Cannot get plan list." });
+  }
+};
+
 // Returns tasks, plan-colours and user permits under app
 exports.getTaskboard = async (req, res) => {
   const username = req.username;
   const { appName } = req.body;
-  const getAppTasksQuery = "SELECT task_id, task_name, task_owner, task_plan, task_state FROM task WHERE task_app_acronym =?";
+  const getAppTasksQuery = "SELECT * FROM task WHERE task_app_acronym =?";
   const getAppPlansQuery = "SELECT plan_mvp_name, plan_colour FROM plan WHERE plan_app_acronym=?";
   const getAppPermits = "SELECT app_permit_create, app_permit_open, app_permit_todolist, app_permit_doing, app_permit_done FROM application WHERE app_acronym=?";
 
@@ -324,7 +354,7 @@ exports.createTask = async (req, res) => {
             });
           }
           console.log("Transaction Complete! New task:", newTask, "task_id:", task_id);
-          return res.json({ success: true, message: "Task created successfully: " + newTask.task_name, createdTask: { task_id: task_id, task_name: newTask.task_name, task_plan: newTask.task_plan, task_owner: username, task_state: "Open" } });
+          return res.json({ success: true, message: "Task created successfully: " + newTask.task_name, createdTask: { task_id, task_name: newTask.task_name, task_plan: newTask.task_plan, task_owner: username, task_state: "Open", task_description: newTask.task_description, task_notes: newTask.task_notes, task_app_acronym: newTask.task_app_acronym, task_creator: username, task_createdate: createDate } });
         });
       } catch (error) {
         // Rollback the transaction on error
@@ -337,36 +367,6 @@ exports.createTask = async (req, res) => {
   } catch (err) {
     console.error("Error occurred: ", err);
     return res.json({ success: false, message: "Cannot create task" });
-  }
-};
-
-// Returns task details and plan list under app
-exports.getTask = async (req, res) => {
-  const { taskId } = req.body;
-  const getTaskQuery = "SELECT * FROM task WHERE task_id=?";
-  const getPlansQuery = "SELECT plan_mvp_name FROM plan WHERE plan_app_acronym=?";
-
-  try {
-    const task = await new Promise((resolve, reject) => {
-      db.query(getTaskQuery, [taskId], (error, results) => {
-        if (error) return reject(error);
-        resolve(results[0]);
-      });
-    });
-
-    const plans = await new Promise((resolve, reject) => {
-      db.query(getPlansQuery, [task.task_app_acronym], (error, results) => {
-        if (error) return reject(error);
-        resolve(results);
-      });
-    });
-    // Format data into array of plan_mvp_name(s)
-    const planList = plans.map(rowData => rowData.plan_mvp_name);
-
-    return res.json({ success: true, task, planList });
-  } catch (err) {
-    console.error("Error occurred: ", err);
-    return res.json({ success: false, message: "Cannot get task." });
   }
 };
 
@@ -420,13 +420,12 @@ exports.promoteTask = async (req, res) => {
     }
 
     // To update in taskboard
-    const promotedTask = {
-      task_id: taskId,
-      task_name: task.task_name,
-      task_owner: username,
-      task_plan: selectedPlan,
-      task_state: promotedState
-    };
+    const promotedTask = await new Promise((resolve, reject) => {
+      db.query(getTaskQuery, [taskId], (error, results) => {
+        if (error) return reject(error);
+        resolve(results[0]);
+      });
+    });
 
     // Send email for tasks pending review
     if (promotedState === "Done") {
@@ -526,13 +525,12 @@ exports.demoteTask = async (req, res) => {
     }
 
     // To update in taskboard
-    const demotedTask = {
-      task_id: taskId,
-      task_name: task.task_name,
-      task_owner: username,
-      task_plan: selectedPlan,
-      task_state: demotedState
-    };
+    const demotedTask = await new Promise((resolve, reject) => {
+      db.query(getTaskQuery, [taskId], (error, results) => {
+        if (error) return reject(error);
+        resolve(results[0]);
+      });
+    });
 
     return res.json({ success: true, message: "Task demoted: " + taskId, demotedTask });
   } catch (err) {
@@ -572,16 +570,15 @@ exports.updateTask = async (req, res) => {
     }
 
     // To update in taskboard
-    const updatedTask = {
-      task_id: taskId,
-      task_name: task.task_name,
-      task_owner: username,
-      task_plan: selectedPlan,
-      task_state: task.task_state
-    };
+    const updatedTask = await new Promise((resolve, reject) => {
+      db.query("SELECT * FROM task WHERE task_id=?", [taskId], (error, results) => {
+        if (error) return reject(error);
+        resolve(results[0]);
+      });
+    });
 
     // Send response
-    return res.json({ success: true, message: "Saved changes for " + taskId, updatedTask, updatedNotes });
+    return res.json({ success: true, message: "Saved changes for " + taskId, updatedTask });
   } catch (err) {
     console.error("Error occurred: ", err);
     return res.json({ success: false, message: "Cannot save changes." });
@@ -597,7 +594,7 @@ exports.isPermittedAction = async (req, res, next) => {
   try {
     if (req.body.taskId) {
       // For routes under existing tasks
-      const { taskId } = req.body;
+      const { taskId, taskState } = req.body;
 
       // Get task by task id
       const task = await new Promise((resolve, reject) => {
@@ -614,6 +611,12 @@ exports.isPermittedAction = async (req, res, next) => {
           resolve(results[0]);
         });
       });
+
+      // Check if task state synced up btwn FE and BE
+      if (taskState !== task.task_state) {
+        console.log("not in sync");
+        return res.status(409).json({ success: false, message: `${taskId} no longer in ${taskState} state.` });
+      }
 
       // Check relevant permit against task state
       switch (task.task_state) {

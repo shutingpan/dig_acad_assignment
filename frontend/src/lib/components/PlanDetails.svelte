@@ -95,7 +95,7 @@
   }
 </script>
 
-  <div class="modal-overlay" on:click={closeModal} on:keydown={closeModal} role="button" tabindex="0"></div>
+  <div class="modal-overlay" on:click={closeModal} on:keydown|preventDefault role="button" tabindex="0"></div>
 
   <div class="modal-content">
     <button class="close-button" on:click={closeModal}>x</button>

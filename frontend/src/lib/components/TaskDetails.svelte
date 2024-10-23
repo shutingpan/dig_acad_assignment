@@ -14,10 +14,9 @@
     task_creator: "",
     task_createdate: "",
     task_description: "",
-    task_notes: ""
+    task_notes: "",
+    task_app_acronym: ""
   };
-
-  // export let appName = ""; // Dont actually need this anymore when hv taskid
 
   // Permissions
   export let taskOpen = false;
@@ -54,14 +53,12 @@
       promoteAction = "Save and Approve";
       demoteAction = "Save and Reject";
       break;
-    default: console.log("No promote or demote actions.");
   }
 
   // Get task details
   onMount(async () => {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/task', {
-        // appName, 
         taskId: task.task_id
       }, {
         headers: {
@@ -70,15 +67,10 @@
       });
 
       if (response.data.success) {
-        task = response.data.task;
         plans = response.data.planList;
       }
     } catch (err : any) {
-      if (err.response && err.response.status === 401) {
-          goto('/login'); // Unauthorized 
-      } else {
-          console.error("An error occurred: ", err);
-      }
+      handleError(err);
     }
   });
 
@@ -91,6 +83,7 @@
     try {
       const response = await axios.post('http://localhost:3000/tms/app/promoteTask', {
         taskId: task.task_id,
+        taskState: task.task_state,
         newNote,
         selectedPlan
       }, {
@@ -106,14 +99,7 @@
         setTimeout(()=> {errMsg=""}, 4000);
       }
     } catch (err : any) {
-      if (err.response && err.response.status === 401) {
-          goto('/login'); // Unauthorized 
-      } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
-          errMsg = err.response.data.message;
-          setTimeout(()=> {errMsg=""}, 4000);
-      } else {
-          console.error("An error occurred: ", err);
-      }
+      handleError(err);
     }
   }
 
@@ -122,6 +108,7 @@
     try {
       const response = await axios.post('http://localhost:3000/tms/app/demoteTask', {
         taskId: task.task_id,
+        taskState: task.task_state,
         newNote,
         selectedPlan
       }, {
@@ -137,14 +124,7 @@
         setTimeout(()=> {errMsg=""}, 4000);
       }
     } catch (err : any) {
-      if (err.response && err.response.status === 401) {
-          goto('/login'); // Unauthorized 
-        } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
-          errMsg = err.response.data.message;
-          setTimeout(()=> {errMsg=""}, 4000);     
-        } else {
-          console.error("An error occurred: ", err);
-      }
+      handleError(err);
     }
   }
 
@@ -152,6 +132,7 @@
       try {
         const response = await axios.post('http://localhost:3000/tms/app/updateTask', {
           taskId: task.task_id,
+          taskState: task.task_state,
           newNote,
           selectedPlan
         }, {
@@ -165,14 +146,8 @@
           errMsg = response.data.message;
           isSuccess = response.data.success;
           setTimeout(()=> {errMsg=""; isSuccess = false;}, 4000);
-          // Update owner
-          task.task_owner = response.data.updatedTask.task_owner;
-          // Update notes (if any)
-          if (response.data.updatedNotes) {
-            task.task_notes = response.data.updatedNotes;
-          }
-          // Update plan (if any)
-          task.task_plan = response.data.updatedTask.task_plan;
+          // Update task
+          task = response.data.updatedTask;
           // Reset to saved changes
           origPlan = response.data.updatedTask.task_plan;
           selectedPlan = response.data.updatedTask.task_plan;
@@ -183,20 +158,28 @@
           setTimeout(()=> {errMsg=""}, 4000);
         }
       } catch (err : any) {
-        if (err.response && err.response.status === 401) {
-          goto('/login'); // Unauthorized 
-        } else if ( err.response && err.response.status === 403 || err.response && err.response.status === 500 ){
-          errMsg = err.response.data.message;
-          setTimeout(()=> {errMsg=""}, 4000);
-        } else {
-          console.error("An error occurred: ", err);
+        handleError(err);
       }
-      }
+  }
+
+  function handleError(err : any) {
+    if (err.response && err.response.status === 401) {
+      goto('/login'); // Unauthorized 
+    } else if (err.response && err.response.status === 409) {
+      errMsg = err.response.data.message; // Conflict in task state
+      setTimeout(()=> {errMsg=""}, 4000);
+      dispatch('reload-taskboard'); 
+    } else if ( err.response && ( err.response.status === 403 || err.response.status === 500 )) {
+      errMsg = err.response.data.message; // Forbidden (not permitted) / Unexpected 
+      setTimeout(()=> {errMsg=""}, 4000);
+    } else {
+      console.error("An error occurred: ", err);
+    }
   }
 
 </script>
 
-  <div class="modal-overlay" on:click={closeModal} on:keydown={closeModal} role="button" tabindex="0"></div>
+  <div class="modal-overlay" on:click={closeModal} on:keydown|preventDefault role="button" tabindex="0"></div>
 
   <div class="modal-content">
     <button class="close-button" on:click={closeModal}>x</button>

@@ -65,7 +65,7 @@
         // Notification
         isSuccess = response.data.success;
         errMsg = response.data.message;
-        setTimeout(() => {errMsg=""}, 4000);
+        setTimeout(() => {errMsg="";}, 4000);
         // Reset inputs
         newTask.task_name = "";
         newTask.task_plan = "";
@@ -90,7 +90,7 @@
 
 </script>
 
-  <div class="modal-overlay" on:click={closeModal} on:keydown={closeModal} role="button" tabindex="0"></div>
+  <div class="modal-overlay" on:click={closeModal} on:keydown|preventDefault role="button" tabindex="0"></div>
 
   <form on:submit|preventDefault={createTask}>
     <div class="modal-content">

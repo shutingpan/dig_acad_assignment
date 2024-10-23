@@ -7,7 +7,7 @@
 <div class="taskcard" on:click={onViewTask(task)} on:keydown|preventDefault role="button" tabindex="0" style="border-left: 4px solid {colour};">
   <span class="taskid">ID: {task.task_id}</span>
   <h3>{task.task_name}</h3>
-  <span class="taskowner">Owned by {task.task_owner}</span>
+  <span class="taskowner">Owner: {task.task_owner}</span>
 </div>
 
 <style>
