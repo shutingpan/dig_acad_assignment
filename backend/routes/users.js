@@ -34,7 +34,6 @@ router.route("/tms/app/taskboard").post(isAuthenticatedUser, getTaskboard);
 router.route("/tms/app/task").post(isAuthenticatedUser, getPlanList);
 
 // TMS - Task actions
-// Based on app-permits: block ability to view action (FE) & perform action (BE)
 router.route("/tms/app/createTask").post(isAuthenticatedUser, isPermittedAction, createTask);
 router.route("/tms/app/promoteTask").post(isAuthenticatedUser, isPermittedAction, promoteTask);
 router.route("/tms/app/demoteTask").post(isAuthenticatedUser, isPermittedAction, demoteTask);

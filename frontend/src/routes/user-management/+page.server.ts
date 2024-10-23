@@ -2,14 +2,16 @@ import { error, redirect } from "@sveltejs/kit";
 import axios from "axios";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ cookies }) => {
+export const load: PageServerLoad = async ({ request, cookies }) => {
   try {
     const token = cookies.get("token");
+    const userAgent = request.headers.get("user-agent");
 
     // Server-side requests: need to explicitly include cookie in headers as server not automatically aware of cookies sent by client
     const response = await axios.get("http://localhost:3000/ums", {
       headers: {
-        Cookie: `token=${token}`
+        Cookie: `token=${token}`,
+        "User-Agent": userAgent
       },
       withCredentials: true
     });

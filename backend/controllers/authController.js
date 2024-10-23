@@ -69,10 +69,28 @@ exports.isAuthenticatedUser = async (req, res, next) => {
   }
 
   try {
+    // Get browser type and ip address
+    const browser = req.headers["user-agent"];
+    const clientIp = req.ip || req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    // Cookie options (for clearing)
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/"
+    };
+
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // Attach the decoded username to the request object
     req.username = decoded.username;
+
+    // Mismatch of browser or IP
+    if (decoded.browser !== browser && decoded.clientIp !== clientIp) {
+      // Clear token cookie
+      res.clearCookie("token", options);
+      return res.status(401).json({ message: "Origin mismatch." });
+    }
+
     console.log("Verified user from JWT token:" + req.username);
 
     const activeResult = await new Promise((resolve, reject) => {
@@ -82,14 +100,10 @@ exports.isAuthenticatedUser = async (req, res, next) => {
       });
     });
 
+    // Disabled active status
     isActive = activeResult[0].isActive;
     if (!isActive) {
       // Clear token cookie
-      const options = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/"
-      };
       res.clearCookie("token", options);
       // Send response
       return res.status(401).json({ message: "Unauthorised user." });

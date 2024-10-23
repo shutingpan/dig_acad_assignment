@@ -6,7 +6,7 @@ const transporter = require("../config/nodemailer");
 const appAcronym_RegEx = /^[a-zA-Z0-9]+$/;
 // Plan MVP Name is alphanumeric
 const planMVPName_RegEx = /^[a-zA-Z0-9]+$/;
-// Task name is alphanumeric & spaces
+// Task name is alphanumeric (\s for spaces if need)
 const taskName_RegEx = /^[a-zA-Z0-9]+$/;
 
 function stampNotes(newNote, currentNotes, owner, taskState) {
