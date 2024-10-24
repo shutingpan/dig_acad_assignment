@@ -5,9 +5,11 @@ const transporter = require("../config/nodemailer");
 // App Acronym is alphanumeric
 const appAcronym_RegEx = /^[a-zA-Z0-9]+$/;
 // Plan MVP Name is alphanumeric
-const planMVPName_RegEx = /^[a-zA-Z0-9]+$/;
-// Task name is alphanumeric (\s for spaces if need)
-const taskName_RegEx = /^[a-zA-Z0-9]+$/;
+const planMVPName_RegEx = /^[a-zA-Z0-9\s]+$/;
+// Task name is alphanumeric
+const taskName_RegEx = /^[a-zA-Z0-9\s]+$/;
+// Rnumber is 0 or positive integer
+const rNum_Regex = /^(0|[1-9]\d*)$/;
 
 function stampNotes(newNote, currentNotes, owner, taskState) {
   // Stamp with username, datetime and task state
@@ -65,6 +67,11 @@ exports.createApp = async (req, res) => {
       });
     });
 
+    // Check rnumber
+    if (!rNum_Regex.test(newApp.app_rnumber)) {
+      return res.json({ success: false, message: "Invalid Rnumber." });
+    }
+
     if (!isNewApp) {
       // If app alr exist
       return res.json({ success: false, message: "App already exists." });
@@ -85,6 +92,33 @@ exports.createApp = async (req, res) => {
   } catch (err) {
     console.error("Error occurred: ", err);
     return res.json({ success: false, message: "Cannot create app." });
+  }
+};
+
+exports.editApp = async (req, res) => {
+  const { editingApp } = req.body;
+  const editAppQuery = "UPDATE application SET app_startdate=?, app_enddate=?, app_permit_create=?, app_permit_open=?, app_permit_todolist=?, app_permit_doing=?, app_permit_done=?, app_description=? WHERE app_acronym=?";
+  const editedAppFields = [editingApp.app_startdate, editingApp.app_enddate, editingApp.app_permit_create, editingApp.app_permit_open, editingApp.app_permit_todolist, editingApp.app_permit_doing, editingApp.app_permit_done, editingApp.app_description, editingApp.app_acronym];
+
+  try {
+    // Ensure dates are still valid
+    const date_RegEx = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+    if (!date_RegEx.test(editingApp.app_startdate) || !date_RegEx.test(editingApp.app_enddate)) {
+      return res.json({ success: false, message: `Invalid date.` });
+    }
+
+    // Save app edits
+    await new Promise((resolve, reject) => {
+      db.query(editAppQuery, editedAppFields, error => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+
+    return res.json({ success: true, message: `App saved: ${editingApp.app_acronym}`, editingApp });
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: `Cannot edit app: ${editingApp.app_acronym}` });
   }
 };
 
@@ -264,9 +298,9 @@ exports.createTask = async (req, res) => {
     }
 
     // Stamp notes (if any)
-    if (newTask.task_notes.trim() !== "") {
-      newTask.task_notes = stampNotes(newTask.task_notes, "", username, "-");
-    }
+    // if (newTask.task_notes.trim() !== "") {
+    newTask.task_notes = stampNotes("Task created\n\n" + newTask.task_notes, "", username, "-");
+    // }
 
     // Get creation date
     const createDate = new Date().toISOString().split("T")[0];
@@ -343,6 +377,7 @@ exports.promoteTask = async (req, res) => {
   let promoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_notes=?, task_owner=? WHERE task_id=?";
   let updatedNotes = "";
   let promotedState;
+  let auditStmt = "";
 
   try {
     // Get current task by task id
@@ -356,33 +391,38 @@ exports.promoteTask = async (req, res) => {
     switch (task.task_state) {
       case "Open":
         promotedState = "Todo";
+        auditStmt = "Promoting task from Open to Todo";
         break;
       case "Todo":
         promotedState = "Doing";
+        auditStmt = "Promoting task from Todo to Doing";
         break;
       case "Doing":
         promotedState = "Done";
+        auditStmt = "Promoting task from Doing to Done";
         break;
       case "Done":
         promotedState = "Closed";
+        auditStmt = "Promoting task from Done to Closed";
         break;
       default:
         console.log("This task is not promotable.");
     }
 
-    if (newNote.trim() !== "") {
-      // With stamped new note
-      updatedNotes = stampNotes(newNote, task.task_notes, username, task.task_state);
-      db.query(promoteTaskQuery, [promotedState, selectedPlan, updatedNotes, username, taskId], error => {
-        if (error) throw error;
-      });
-    } else {
-      // No new note
-      promoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_owner=? WHERE task_id=?";
-      db.query(promoteTaskQuery, [promotedState, selectedPlan, username, taskId], error => {
-        if (error) throw error;
-      });
-    }
+    // if (newNote.trim() !== "") {
+    // With stamped new note
+    updatedNotes = stampNotes(auditStmt + "\n\n" + newNote, task.task_notes, username, task.task_state);
+    db.query(promoteTaskQuery, [promotedState, selectedPlan, updatedNotes, username, taskId], error => {
+      if (error) throw error;
+    });
+    // task;
+    // } else {
+    // No new note
+    //   promoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_owner=? WHERE task_id=?";
+    //   db.query(promoteTaskQuery, [promotedState, selectedPlan, username, taskId], error => {
+    //     if (error) throw error;
+    //   });
+    // }
 
     // To update in taskboard
     const promotedTask = await new Promise((resolve, reject) => {
@@ -453,6 +493,7 @@ exports.demoteTask = async (req, res) => {
   let demoteTaskQuery = "UPDATE task SET task_state=?, task_notes=?, task_plan=?, task_owner=? WHERE task_id=?";
   let updatedNotes = "";
   let demotedState;
+  let auditStmt = "";
 
   try {
     // Get current task by task id
@@ -467,27 +508,29 @@ exports.demoteTask = async (req, res) => {
     switch (task.task_state) {
       case "Doing":
         demotedState = "Todo";
+        auditStmt = "Demoting task from Doing to Todo";
         break;
       case "Done":
         demotedState = "Doing";
+        auditStmt = "Demoting task from Done to Doing";
         break;
       default:
         console.log("This task is not demotable.");
     }
 
-    if (newNote.trim() !== "") {
-      // With stamped new note
-      updatedNotes = stampNotes(newNote, task.task_notes, username, task.task_state);
-      db.query(demoteTaskQuery, [demotedState, updatedNotes, selectedPlan, username, taskId], error => {
-        if (error) throw error;
-      });
-    } else {
-      // No new note
-      demoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_owner=? WHERE task_id=?";
-      db.query(demoteTaskQuery, [demotedState, selectedPlan, username, taskId], error => {
-        if (error) throw error;
-      });
-    }
+    // if (newNote.trim() !== "") {
+    // With stamped new note
+    updatedNotes = stampNotes(auditStmt + "\n\n" + newNote, task.task_notes, username, task.task_state);
+    db.query(demoteTaskQuery, [demotedState, updatedNotes, selectedPlan, username, taskId], error => {
+      if (error) throw error;
+    });
+    // } else {
+    // No new note
+    // demoteTaskQuery = "UPDATE task SET task_state=?, task_plan=?, task_owner=? WHERE task_id=?";
+    // db.query(demoteTaskQuery, [demotedState, selectedPlan, username, taskId], error => {
+    //   if (error) throw error;
+    // });
+    // }
 
     // To update in taskboard
     const demotedTask = await new Promise((resolve, reject) => {

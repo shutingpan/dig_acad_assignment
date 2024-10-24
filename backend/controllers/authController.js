@@ -177,6 +177,7 @@ exports.checkGroup = async (username, groupname) => {
   return new Promise((resolve, reject) => {
     db.query("SELECT * FROM user_groups WHERE username = ? AND groupname = ?", [username, groupname], (error, results) => {
       if (error) return reject(error);
+      if (groupname === "") return resolve(false); // when groupname field empty
       return resolve(results.length > 0);
     });
   });

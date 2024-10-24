@@ -21,6 +21,9 @@
         app_description: ''
     };
 
+    // For editing app
+    let editingApp = null; // track app being edited
+
     onMount(async () => {
         try {
             // Get app list, group list and PL status
@@ -94,6 +97,50 @@
         }
     }
 
+     // Edit an app
+     const editApp = (app) => {
+        editingApp = { ...app }; // Set app being edited
+    }
+
+    // Save edited app
+    const saveApp = async () => {
+        try {
+            console.log(editingApp);
+            const response = await axios.post('http://localhost:3000/tms/editApp', {
+                editingApp
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
+
+            if (response.data.success) {
+                // Notif 
+                isCreated = response.data.success;
+                createMsg = response.data.message;
+                setTimeout(() => { createMsg=""}, 3000);
+                // Update the list with new data
+                const index = apps.findIndex(app => app.app_acronym === editingApp.app_acronym);
+                apps[index] = { ...editingApp }; 
+                cancelEdit(); 
+
+            } else {
+                // Notif 
+                isCreated = response.data.success;
+                createMsg = response.data.message;
+                setTimeout(() => { createMsg=""}, 3000);
+            }
+        } catch (err) {
+            console.error("An error occurred: ", err);
+        }
+    }
+
+    // Cancel editing
+    const cancelEdit = () => {
+        editingApp = null;
+    }
+
     function goToApp(appName) {
         localStorage.setItem('appName', appName);
         goto('/tms/taskboard');
@@ -138,7 +185,7 @@
                         </td>
                         <td>
                             <!-- Rnumber -->
-                            {newApp.app_rnumber}
+                             <input type="text" bind:value={newApp.app_rnumber} required>
                         </td>
                         <td>
                             <!-- Start date -->
@@ -150,8 +197,8 @@
                         </td>
                         <td>
                             <!-- Permission: Create -->
-                            <select bind:value={newApp.app_permit_create} required>
-                                <option value="" disabled selected>Select a group</option>
+                            <select bind:value={newApp.app_permit_create}>
+                                <option value="" selected>No group</option>
                                 {#each groups as group}
                                     <option value={group}>{group}</option>
                                 {/each}
@@ -159,8 +206,8 @@
                         </td>
                         <td>
                             <!-- Permission: Open -->
-                            <select bind:value={newApp.app_permit_open} required>
-                                <option value="" disabled selected>Select a group</option>
+                            <select bind:value={newApp.app_permit_open}>
+                                <option value="" selected>No group</option>
                                 {#each groups as group}
                                     <option value={group}>{group}</option>
                                 {/each}
@@ -168,8 +215,8 @@
                         </td>
                         <td>
                             <!-- Permission: To Do -->
-                            <select bind:value={newApp.app_permit_todolist} required>
-                                <option value="" disabled selected>Select a group</option>
+                            <select bind:value={newApp.app_permit_todolist}>
+                                <option value="" selected>No group</option>
                                 {#each groups as group}
                                     <option value={group}>{group}</option>
                                 {/each}
@@ -177,8 +224,8 @@
                         </td>
                         <td>
                             <!-- Permission: Doing -->
-                            <select bind:value={newApp.app_permit_doing} required>
-                                <option value="" disabled selected>Select a group</option>
+                            <select bind:value={newApp.app_permit_doing}>
+                                <option value="" selected>No group</option>
                                 {#each groups as group}
                                     <option value={group}>{group}</option>
                                 {/each}
@@ -186,8 +233,8 @@
                         </td>
                         <td>
                             <!-- Permission: Done -->
-                            <select bind:value={newApp.app_permit_done} required>
-                                <option value="" disabled selected>Select a group</option>
+                            <select bind:value={newApp.app_permit_done}>
+                                <option value="" selected>No group</option>
                                 {#each groups as group}
                                     <option value={group}>{group}</option>
                                 {/each}
@@ -204,25 +251,73 @@
                 {/if}
                 {#each apps as app}
                     <tr>
-                        <td>{app.app_acronym}</td>
-                        <td>{app.app_rnumber}</td>
-                        <td>
-                            <input type="date" value={app.app_startdate} disabled>
-                        </td>
-                        <td>
-                            <input type="date" value={app.app_enddate} disabled>
-                        </td>
-                        <td>{app.app_permit_create}</td>
-                        <td>{app.app_permit_open}</td>
-                        <td>{app.app_permit_todolist}</td>
-                        <td>{app.app_permit_doing}</td>
-                        <td>{app.app_permit_done}</td>
-                        <td class="app-description">
-                            <textarea value={app.app_description} rows="5" disabled></textarea>
-                        </td>
-                        <td>
-                            <button class="open-btn" type="button" on:click={() => goToApp(app.app_acronym)}>Open</button>
-                        </td>
+                        {#if editingApp && editingApp.app_acronym === app.app_acronym}
+                                <!-- Editable Row -->
+                                <td>{editingApp.app_acronym}</td>
+                                <td>{editingApp.app_rnumber}</td>
+                                <td><input type="date" bind:value={editingApp.app_startdate}></td>
+                                <td><input type="date" bind:value={editingApp.app_enddate}></td>
+                                <td>
+                                    <select bind:value={editingApp.app_permit_create} required>
+                                        <option value="">No group</option>
+                                        {#each groups as group}<option value={group}>{group}</option>{/each}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select bind:value={editingApp.app_permit_open} required>
+                                        <option value="">No group</option>
+                                        {#each groups as group}<option value={group}>{group}</option>{/each}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select bind:value={editingApp.app_permit_todolist}>
+                                        <option value="">No group</option>
+                                        {#each groups as group}<option value={group}>{group}</option>{/each}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select bind:value={editingApp.app_permit_doing}>
+                                        <option value="">No group</option>
+                                        {#each groups as group}<option value={group}>{group}</option>{/each}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select bind:value={editingApp.app_permit_done}>
+                                        <option value="">No group</option>
+                                        {#each groups as group}<option value={group}>{group}</option>{/each}
+                                    </select>
+                                </td>
+                                <td class="app-description">
+                                    <textarea bind:value={editingApp.app_description} maxlength="255" rows="5"></textarea>
+                                </td>
+                                <td>
+                                    <button type="button" on:click={saveApp}>Save</button>
+                                    <button type="button" on:click={cancelEdit}>Cancel</button>
+                                </td>
+
+                        {:else}
+                                <!-- Readonly -->
+                                <td>{app.app_acronym}</td>
+                                <td>{app.app_rnumber}</td>
+                                <td>
+                                    <input type="date" value={app.app_startdate} disabled>
+                                </td>
+                                <td>
+                                    <input type="date" value={app.app_enddate} disabled>
+                                </td>
+                                <td>{app.app_permit_create}</td>
+                                <td>{app.app_permit_open}</td>
+                                <td>{app.app_permit_todolist}</td>
+                                <td>{app.app_permit_doing}</td>
+                                <td>{app.app_permit_done}</td>
+                                <td class="app-description">
+                                    <textarea value={app.app_description} rows="5" disabled></textarea>
+                                </td>
+                                <td>
+                                    <button class="open-btn" type="button" on:click={() => goToApp(app.app_acronym)}>Open</button>
+                                    <button class="open-btn" type="button" on:click={() => editApp(app)}>Edit</button>
+                                </td>
+                        {/if}
                     </tr>
                 {/each}
             </tbody>
@@ -290,6 +385,7 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        margin: 3px;
     }
 
     .open-btn:hover {
