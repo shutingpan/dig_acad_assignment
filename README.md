@@ -1,23 +1,23 @@
-Assignment 3 Notes
+## Assignment 3 Background
 
-Refactoring a monlithic app to Microservices Design
+**Refactoring a monlithic app to Microservices Design**
 
 - breaking down app into smaller, independent services
 - e.g. Refactoring a c3 controller
 
-What is a good candidate for a Microservice?
+**What is a good candidate for a Microservice?**
 
-1. Performance: which controller has performance issue?
-2. Scalability: which controller needs to handle high traffic or variable loads?
+1. **Performance**: which controller has performance issue?
+2. **Scalability**: which controller needs to handle high traffic or variable loads?
 
-Microservices and small form factor
+**Microservices and small form factor**
 
 - refer to idea that microservices should be small and lightweight in terms of design and functionality. Each microservice handles a single responsibility or feature of application.
 - smaller services are easier to deploy, maintain and scale. They can also spin up/down quickly, making system more responsive to changing workloads.
 
 compile controller into container > small form factor, spin up/down fast
 
-Implementation Approaches of Microservices (approach depends on type of service)
+**Implementation Approaches of Microservices (approach depends on type of service)**
 
 1. RestAPI
 
@@ -48,20 +48,23 @@ Implementation Approaches of Microservices (approach depends on type of service)
 sub listen to different topic in the queue
 watch out for queue storage size (dont choke the queue). sub ->
 
-Assignment 3
-every restapi needs authentication due to no cookie
-
-- pass in login creds for auth.
+## Assignment 3 notes
+- every RestAPI needs authentication due to absence of cookie --> pass in login creds for auth.
 - specify field type
-  -eg. localhost/createTask
-
-- write an interpreter to map db fields to standardised field names. (dont reset db)
-- note of case-sensitivity differences
+- eg. API: localhost/createTask
+- DO NOT reset database to edit field names: write an interpreter to map db fields to standardised field names. 
+- Take note of case sensitivity-related scenarios
 - lowercase in body
-
 - explore how to get code snippets to work on cmd prompt and powershell,
 - understand when to use curl commands
-  -use postman to see code snippet in
-- decide on naming convention (avoid confusing convention, numbering system would be good
+- use postman to see code snippet in different languages
+- decide on custom naming convention for error codes (avoid elaborate ones, numbering system would be good)
 
-URL - handle special characters (not using params), consider all special characters.
+**Flow:**  
+A | URL/URI - handle special characters (not using params), consider all special characters.  
+
+B | Body structure  
+
+C | IAM  
+
+D | Transaction
