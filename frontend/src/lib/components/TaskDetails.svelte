@@ -82,7 +82,7 @@
   async function promoteTask() {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/promoteTask', {
-        taskId: task.task_id,
+        task_id: task.task_id,
         taskState: task.task_state,
         newNote,
         selectedPlan
@@ -107,7 +107,7 @@
   async function demoteTask() {
     try {
       const response = await axios.post('http://localhost:3000/tms/app/demoteTask', {
-        taskId: task.task_id,
+        task_id: task.task_id,
         taskState: task.task_state,
         newNote,
         selectedPlan
@@ -131,7 +131,7 @@
   async function saveTask() {
       try {
         const response = await axios.post('http://localhost:3000/tms/app/updateTask', {
-          taskId: task.task_id,
+          task_id: task.task_id,
           taskState: task.task_state,
           newNote,
           selectedPlan

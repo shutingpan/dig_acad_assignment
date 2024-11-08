@@ -10,7 +10,7 @@
 1. **Performance**: which controller has performance issue?
 2. **Scalability**: which controller needs to handle high traffic or variable loads?
 
-**Microservices and small form factor**
+**Microservices has small form factor**
 
 - refer to idea that microservices should be small and lightweight in terms of design and functionality. Each microservice handles a single responsibility or feature of application.
 - smaller services are easier to deploy, maintain and scale. They can also spin up/down quickly, making system more responsive to changing workloads.
@@ -49,10 +49,11 @@ sub listen to different topic in the queue
 watch out for queue storage size (dont choke the queue). sub ->
 
 ## Assignment 3 notes
+
 - every RestAPI needs authentication due to absence of cookie --> pass in login creds for auth.
 - specify field type
 - eg. API: localhost/createTask
-- DO NOT reset database to edit field names: write an interpreter to map db fields to standardised field names. 
+- DO NOT reset database to edit field names: write an interpreter to map db fields to standardised field names.
 - Take note of case sensitivity-related scenarios
 - lowercase in body
 - explore how to get code snippets to work on cmd prompt and powershell,
@@ -61,10 +62,10 @@ watch out for queue storage size (dont choke the queue). sub ->
 - decide on custom naming convention for error codes (avoid elaborate ones, numbering system would be good)
 
 **Flow:**  
-A | URL/URI - handle special characters (not using params), consider all special characters.  
+A | URL/URI - handle special characters (not using params), consider all special characters.
 
-B | Body structure  
+B | Body structure
 
-C | IAM  
+C | IAM
 
 D | Transaction

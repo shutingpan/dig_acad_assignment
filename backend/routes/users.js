@@ -1,7 +1,7 @@
 const express = require("express");
 const { getAllUsers, createGroup, createUser, updateEmail, updatePassword, editUser, getProfile } = require("../controllers/adminController");
 const { loginUser, logoutUser, isAuthenticatedUser, authorizedGrps, isAdmin } = require("../controllers/authController");
-const { getAllApps, createApp, getAllPlans, createPlan, getTaskboard, createTask, promoteTask, updateTask, demoteTask, isPermittedAction, getPlanList, editApp } = require("../controllers/tmsController");
+const { getAllApps, createApp, getAllPlans, createPlan, getTaskboard, createTask, promoteTask, updateTask, demoteTask, isPermittedAction, getPlanList, editApp, createtask, gettaskbystate, promotetask2done, validateURL, validateBodyType } = require("../controllers/tmsController");
 const router = express.Router();
 
 // Check admin status
@@ -39,4 +39,9 @@ router.route("/tms/app/promoteTask").post(isAuthenticatedUser, isPermittedAction
 router.route("/tms/app/demoteTask").post(isAuthenticatedUser, isPermittedAction, demoteTask);
 router.route("/tms/app/updateTask").post(isAuthenticatedUser, isPermittedAction, updateTask);
 
+// Assignment 3
+router.use(validateURL, validateBodyType);
+router.route("/createtask").post(createtask);
+router.route("/gettaskbystate").post(gettaskbystate);
+router.route("/promotetask2done").patch(promotetask2done);
 module.exports = router;

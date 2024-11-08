@@ -5,8 +5,8 @@ dotenv.config({ path: "./config/config.env" });
 
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email", // SMTP server
-  port: 587,
+  host: process.env.EMAIL_HOST, // SMTP server
+  port: process.env.EMAIL_PORT,
   secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
