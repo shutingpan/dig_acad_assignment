@@ -69,3 +69,36 @@ B | Body structure
 C | IAM
 
 D | Transaction
+
+## Project Requirements documentation notes
+
+- General
+  - approach documentation as an outsider: clear, understandable user stories and UI interactions for code implementation without additional resources
+- Data Model Document
+  - define tables, column names, data types, field behaviour (Mandatory, Optional, etc.)
+- Acceptance Criteria
+  - details expected input/output
+  - range testing, boundary testing
+
+## Assignment 4 Examples
+
+- Stage A: Prep for Dev Env
+
+```
+<!-- Base Image -->
+docker pull node:20-alpine
+docker save -o node:20-alpine
+
+<!-- App (NodeJS) -->
+<!-- Inside dummy folder containing only package.json, may utilize .npmignore -->
+npm install
+npm pack --pack-destination [destination-folder]
+
+<!-- Security Aspect -->
+
+sha256sum [file] > [file].sha256
+sha256sum --check [file].sha256
+
+<!-- Read .sha256 file -->
+cat [file].sha256
+```
