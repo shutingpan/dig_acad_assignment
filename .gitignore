@@ -12,5 +12,5 @@ node_modules/
 .vscode/
 
 # Ignore sensitive info & environment variables
-backend/config/config.env
 *.sha256
+*.env
