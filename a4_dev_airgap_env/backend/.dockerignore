@@ -1,0 +1,5 @@
+./config/config.env
+.npmignore
+*.txt
+Dockerfile_alt
+Dockerfile
