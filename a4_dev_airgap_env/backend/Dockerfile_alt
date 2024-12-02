@@ -1,0 +1,43 @@
+# Selected base image
+FROM node:20-alpine
+
+# Set up user and group without a password prompt (-D flag)
+RUN addgroup appgroup && adduser appuser -D -G appgroup
+
+# Set root directory
+WORKDIR /app
+
+# Copy .tgz to container
+COPY . .
+
+# Extract file, remove top-level directory from creating .tgz file from npm pack
+RUN tar -xzvf backend-1.0.0.tgz --strip-components=1 && rm backend-1.0.0.tgz 
+
+# Check valid package.json (run cmd on right if left fails (non-zero exit status))
+RUN cmp package.json ./temp/package.json && rm -r ./temp || exit 1
+
+# RUN application as non-system user
+RUN chmod -R 755 /app
+
+USER appuser
+
+EXPOSE 3000
+
+CMD ["node", "index.js"]
+
+# This container works 
+
+# --------- Notes ----------------
+  # Do not change ownership of app folder 
+  # e.g. RUN chown -R appuser:appgroup /app 
+
+# --------- Terminal Cmds ----------------
+# docker build -t a4:latest .
+# docker build --no-cache  -t a4:latest .      
+# docker run -p 3000:3000 --env-file ./config/config.env --name a4-container --rm a4:latest
+
+# When container running...
+# Check for user
+# > docker exec a4-container whoami
+
+# handle nodemailer
