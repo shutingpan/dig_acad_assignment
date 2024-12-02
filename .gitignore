@@ -6,6 +6,9 @@
 */node_modules/
 node_modules/
 
+# base image files
+node_20alpine.tar
+
 # Stores VSCode versions used for testing VSCode extensions
 */.vscode-test/
 */.vscode/
