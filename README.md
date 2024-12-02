@@ -82,23 +82,49 @@ D | Transaction
 
 ## Assignment 4 Examples
 
-- Stage A: Prep for Dev Env
+Stage A: Prep for Dev Env
 
 ```
-<!-- Base Image -->
+# Prepare Base Image into .tar file
 docker pull node:20-alpine
 docker save -o node:20-alpine
 
-<!-- App (NodeJS) -->
-<!-- Inside dummy folder containing only package.json, may utilize .npmignore -->
+# Prepare App (NodeJS) into .tgz file
+# Note: Dummy folder was used containing only package.json, optional use of .npmignore
 npm install
 npm pack --pack-destination [destination-folder]
 
-<!-- Security Aspect -->
-
+# Security Aspect (Fingerprints)
+# Executed in WSL
 sha256sum [file] > [file].sha256
-sha256sum --check [file].sha256
+sha256sum --check [file].sha256    # to verify fingerprint
+cat [file].sha256                  # to check file contents
 
-<!-- Read .sha256 file -->
-cat [file].sha256
+# Security Aspect (File Compression with password)
+# Executed in Windows Powershell
+tar -czvf [output-file].tgz [file-to-compress-1].tgz [file-to-compress-2].tar
+
+# Example
+tar -czvf archive_node20alp_backend.tgz .\backend-1.0.0.tgz .\node_20alpine.tar
+
+# Encrypt with password, Executed in WSL
+gpg -c [file-to-encrypt].tgz
+
+# Example
+gpg -c archive_node20alp_backend.tgz
+
+```
+
+Stage B Extract & Verify & Load
+
+```
+# Decrypt with password, Executed in WSL
+gpg -o archive_decrypted.tgz -d archive_node20alp_backend.tgz.gpg
+
+# Extract in WSL
+tar -xzvf archive_decrypted.tgz
+
+# Verify
+sha256sum --check
+
 ```
