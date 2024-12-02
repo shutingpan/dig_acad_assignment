@@ -13,3 +13,4 @@ node_modules/
 
 # Ignore sensitive info & environment variables
 backend/config/config.env
+*.sha256
