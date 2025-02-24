@@ -1,3 +1,18 @@
+## Setup
+
+Navigate to frontend folder then:
+- `npm run dev`
+- navigate to localhost port 5173 to view website
+
+Navigate to backend folder then:
+- `node index.js` 
+
+To recreate the environment locally, note (from checks on local machine and recall ): 
+- SQL server was setup in local machine using My SQL Workbench 8.0 CE (user:root, localhost:3306)
+- `node --version` returns v20.17.0
+- `express --version` returns 4.16.1
+- refer to SW foundation assignment file
+
 ## Assignment 3 Background
 
 **Refactoring a monlithic app to Microservices Design**
